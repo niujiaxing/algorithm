@@ -1,7 +1,7 @@
-# TCP相关
+计算机网络知识总结
 
 [TOC]
-
+# TCP相关
 
 ## 1 简述 TCP 三次握手以及四次挥手的流程。为什么需要三次握手以及四次挥手
 
@@ -79,7 +79,55 @@ TCP 通过序列号，检验和，确认应答，重发控制，连接管理，�
 	![retransmit](img/快重传.png)
 
 
+# RestFul 相关总结
 
+##1.RestFul 是什么？RestFul 请求的 URL 有什么特点
+![restful](img/RestFul.jpg)
+**REST**
+Representational State Transfer
+用来表示客户端通过某种形式获取服务器端的数据，这些数据通常是JSON或者XML。可以理解为：在设计API时，使用路径定位资源，方法定义操作，通过Cotent-Type和Accept协商资源类型
+- **资源的定义**
+	- 资源是什么：任何事物只要有被引用到的必要，就可以称之为资源，列如，某人的手机号，个人信息，两个产品的关系
+	- URI（Uniform Resource Identifier)表示一个资源的唯一标识（可寻址）
+- **Representation** 表现层：把资源具体呈现出来的形式，例如，文本可用txt,json,html格式表现。
+-  **状态转换(State Transfer)**
+	- 每发出一个请求，就代表了客户端和服务器的一次交互。HTTP协议是无状态协议，所有的状态都保存在服务器端。因此，客户端想要操作服务器，必须通过某种手段让服务器发生状态转移(State Transfer)。就是HTTP协议里面，四个表示操作方式的动词：GET、POST、PUT、DELETE。他们分别对应四种基本操作：GET用来获取资源，POST用来新建资源，PUT用来更新资源，DELETE用来删除资源。
+		- GET
+		- PUT
+		- POST
+		- DELETE
 
+**限制**
+- REST是无状态的，请求之间没有持久的会话信息
+- 响应需要声明成可缓存的
+- REST关注一致性，如果使用HTTP，需要尽可能使用HTTP的特性，而不是去发明新的公约
 
+##2.RestFul 与 RPC 的区别是什么？RestFul 的优点在哪里？
 
+###RPC
+RPC代表远程过程调用（romote procedure call），RPC是跨语言跨平台的服务调用。在实际应用中，前端传递方法名和参数给后端，后端执行对应方法，并将最后执行结果返回给前端。
+- 1.REST使用HTTP的方法，例如：GET,POST,PUT,DELETE,OPTIONS还有比较不常用的PATCH方法。
+- 2.RPC通常只会使用GET和POST方法，GET方法通常用来获取信息，POST方法可以用来进行所有的行为。
+- 3.RPC：发送一个消息，然后消息会存储到数据库中来保存历史，有可能会有其他的RPC调用，但这个操作对我们不可见
+- 4.REST：在用户的消息集合中创建一条消息资源，我们能够通过GET方法来通过相同的URL获取这个历史
+
+**RPC  &&  ReatFul**
+当发送一条消息给用户
+RPC
+```
+POST /SendUserMessage HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+
+{"userId": 501, "message": "Hello!"}
+```
+
+REST
+```
+POST /users/501/messages HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+
+{"message": "Hello!"}
+
+```

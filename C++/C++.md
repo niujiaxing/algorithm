@@ -263,5 +263,190 @@ int main()
 }
 ```
 
+##3.C++ 中多态是怎么实现的  
+- 多态，即多种状态（形态）。简单来说，我们可以将多态定义为消息以多种形式显示的能力。
+- 多态是以封装和继承为基础的。
+- C++ 多态分类及实现：
+    1. 重载多态（Ad-hoc Polymorphism，编译期）：函数重载（子类与父类函数名一致属于重载多态）、运算符重载（命名 operate  <运算符> 的函数即运算符重载）
+    2. 子类型多态（Subtype Polymorphism，运行期）：虚函数 *
+    3. 参数多态性（Parametric Polymorphism，编译期）：类模板、函数模板
+    4. 强制多态（Coercion Polymorphism，编译期/运行期）：基本类型转换、自定义类型转换
 
+- 虚函数
+	- 类里如果声明了虚函数，这个函数是实现的，哪怕是空实现，它的作用就是为了能让这个函数在它的子类里面可以被覆盖（override），这样的话，编译器就可以使用后期绑定来达到多态了。
+
+**代码实现**(虚函数)
+
+```c++
+#include "stdio.h"
+#include "conio.h"
+class Parent
+{    
+public:
+    char data[20];    
+    void Function1();
+    virtual void Function2(); // 这里声明Function2是虚函数    
+}parent;
+void Parent::Function1()
+{
+    printf("This is parent,function1\n");
+}
+void Parent::Function2()
+{
+    printf("This is parent,function2\n");
+}
+class Child: public Parent
+{
+    void Function1();
+    void Function2();
+
+} child;
+void Child::Function1()
+{
+    printf("This is child,function1\n");
+}
+void Child::Function2()
+{
+    printf("This is child,function2\n");
+}
+int main(int argc, char* argv[])
+{    
+    Parent *p; // 定义一个基类指针    
+
+    if ( _getch()=='c' ) // 如果输入一个小写字母c
+        p=&child; // 指向继承类对象
+    else
+        p=&parent; // 否则指向基类对象
+
+    p->Function1(); // 这里在编译时会直接给出Parent::Function1()的 入口地址。   
+    p->Function2(); // 注意这里，执行的是哪一个Function2？
+
+    return 0;
+}
+
+```
+- 用任意版本的Visual C++或Borland C++编译并运行，输入一个小写字母c，得到下面的结果：
+**This is parent,function1
+This is child,function2**
+- 为什么会有第一行的结果呢？因为我们是用一个Parent类的指针调用函数Fuction1()，虽然实际上这个指针指向的是Child类的对象，但编译器 无法知道这一事实（直到运行的时候，程序才可以根据用户的输入判断出指针指向的对象），它只能按照调用Parent类的函数来理解并编译，所以我们看到了 第一行的结果。
+
+- 那么第二行的结果又是怎么回事呢？我们注意到，Function2()函数在基类中被virtual关键字修饰，也就是 说，它是一个虚函数。虚函数最关键的特点是“**动态联编**”，它可以在运行时判断指针指向的对象，并自动调用相应的函数。如果我们在运行上面的程序时任意输入 一个非c的字符，结果如下：
+**This is parent,function1
+This is parent,function2**
+
+- 请注意看第二行，它的结果出现了变化。程序中仅仅调用了一个Function2()函数，却可以根据用户的输入自动决定到底调用基类中的Function2 还是继承类中的Function2，这就是虚函数的作用。把它定义为虚函数,可以保证时刻调用的是用户自己编写的函数。
+
+
+
+##4.C++ 11 有什么新特性
+
+### **auto**
+auto: 让编译器自动推导出变量的类型，可以通过=右边的类型推导出变量的类型。
+```c++
+auto a = 10
+```
+
+### **左值右值**
+- 左值：可以取地址并且有名字的东西就是左值。
+- 右值：不能取地址的没有名字的东西就是右值。
+
+### **列表初始化**
+- 在C++11中可以直接在变量名后面加上初始化列表来进行对象的初始化
+
+### **智能指针**
+- std::shared_ptr
+- std::weak_ptr
+- std::unique_ptr
+
+### **基于范围的for循环**
+```c++
+vector<int> vec;
+
+for (auto iter = vec.begin(); iter != vec.end(); iter++) { // before c++11
+    cout << *iter << endl;
+}
+
+for (int i : vec) { // c++11基于范围的for循环
+    cout << "i" << endl;
+}
+```
+
+### **nullptr**
+- nullptr 是c++11 用来表示空指针引入的常量值，在c++中如果表示空指针语义时建议用nullptr而不是NULL，因为NULL本质上是个int型的0
+
+```c++
+void func(void *ptr) {
+    cout << "func ptr" << endl;
+}
+
+void func(int i) {
+    cout << "func i" << endl;
+}
+
+int main() {
+    func(NULL); // 编译失败，会产生二义性
+    func(nullptr); // 输出func ptr
+    return 0;
+}
+```
+
+### **final & override**
+- final 用于修饰一个类，表示禁止该类进一步派生和虚函数的进一步重载，override用于修饰派生类中的成员函数，表明该函数重写了基类函数
+
+## 简述 C++ 中智能指针的特点，简述 new 与 malloc 的区别
+
+C++中的智能指针
+![](img/智能指针.png)
+- std::shared_ptr
+- std::unique_ptr
+- std::weak_ptr
+
+###new 与 malloc
+- 1.申请内存所在位置，new在自由存储区（free store)上为对象分配内存，而malloc从堆上动态为对象分配内存
+	1.凡是通过new进行内存申请，该内存即为自由存储区。而堆是操作系统中的术语，是操作系统维护的一块特殊内存
+
+- 2.返回类型，new返回的是严格匹配对象的类型，malloc返回void （\*），需要强制转换成我们需要的类型
+
+- 3.类型分配失败时返回值 new分配失败会报出 bac_alloc异常，malloc失败则会返回NULL
+
+- 4.是否需要制定内存大小    new编译器会自动计算，而malloc需要显示指出所需内存的尺寸
+
+- 5.是否需要调用构造函数和析构函数  new delete 调用  malloc则不需要调用
+
+**总结**
+
+
+|特征|new/delete|malloc/free|
+|-|-|-|
+|分配内存的位置   |自由存储区   |  堆 |
+| 内存分配成功返回值   | 对象类型    | void\*    |
+| 内存分配失败返回   |  抛出异常   |  NULL   |
+| 分配内存   |  由编译器计算得出   |  需要指定大小   |
+| 数组分配内存   |  可以直接处理数组new[]   |  需要给定数组长度 |
+|内存扩充    |  自动扩充   | 需要使用realloc    |
+| 调用构造函数和析构函数 | 调用 |不调用  |
+
+
+
+
+
+## STL 中 vector 与 list 具体是怎么实现的？常见操作的时间复杂度是多少？
+
+###vector&&list
+- **vector**
+	- 表示可以改变大小的数组的序列容器
+	- 底层结构为数组，里面有一个指针指向一篇连续的地址空间，如果空间不够，需要重新分配内存，一般是当前大小的两倍
+	- size()表示数组元素 capacity()表示数组有多大容量
+- **list**
+	- 是序列容容器，允许在序列中任何地方进行常数时间插入和删除操作，并在两个方向上进行迭代
+	- 底层数据结构为双向列表，以节点为单位存放数据，节点在内存中的地址不一定连续，每次插入或删除一个元素，就配置或释放一个元素空间
+	- 无序，可重复 
+- **vector vs list**
+|对比项   | vector  | list  |
+| -   |  -  |   - |
+|底层实现   | 数组  | 链表  |
+| 是否支持随机访问  | 支持  | 不支持  |
+| 分配内存  | 一次分配好，不够的话重新分配  | 每次插入新节点进行内存申请  |
+| 插入删除  | 需要遍历O(N)  | O(1)  |
+|  有序访问下标  |  O(1)  |  O(N)  |
 

@@ -1,0 +1,23 @@
+class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        ## 基础方法，去空判断是否相反
+        # newstr = ''
+        # for i in s:
+        #     if i.isalnum():
+        #         newstr = newstr + i.lower()
+        # # print(newstr)
+        # return newstr == newstr[::-1]
+
+        ## 双指针解法
+        ## 先格式化
+        ## 后分别判断左右两个指针指向的值是否相等
+        newstr = ''.join(ch.lower() for ch in s if ch.isalnum())
+        print(newstr)
+        left = 0
+        right = len(newstr) - 1
+        while left < right:
+            if newstr[left] != newstr[right]:
+                return False
+            left += 1
+            right -= 1
+        return True

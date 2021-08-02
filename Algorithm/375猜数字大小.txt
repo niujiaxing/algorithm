@@ -1,0 +1,20 @@
+class Solution(object):
+    def getMoneyAmount(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        ## 使用DFS
+        def getnumber(left,right):
+            ## 在left,right 区间内选择一个数查找x
+            if right <= left:
+                return 0
+            m = [0] * (right-left+1)
+            mi = 0
+            
+            for i in range(left,right+1):
+                m[mi] = i + max(getnumber(left,i-1),getnumber(i+1,right))
+                mi += 1
+            return min(m)
+
+        return getnumber(1,n)
